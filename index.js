@@ -33,17 +33,15 @@ module.exports = function hkdf (salt, input, info, keylen, digest) {
   }
 
   return Promise.resolve().then(function () {
-    return new Promise(function (resolve, reject) {
-      const prk = hmac(digest, salt, input)
-      const parts = [Buffer.from('')]
+    const prk = hmac(digest, salt, input)
+    const parts = [Buffer.from('')]
 
-      for (let i = 0; i < iterations; i++) {
-        parts.push(hmac(digest, prk, Buffer.concat([parts[i], info, Buffer.from([i + 1])])))
-      }
+    for (let i = 0; i < iterations; i++) {
+      parts.push(hmac(digest, prk, Buffer.concat([parts[i], info, Buffer.from([i + 1])])))
+    }
 
-      const result = Buffer.concat(parts).slice(0, keylen)
+    const result = Buffer.concat(parts).slice(0, keylen)
 
-      resolve(result.buffer.slice(result.byteOffset, result.byteOffset + result.byteLength))
-    })
+    return result.buffer.slice(result.byteOffset, result.byteOffset + result.byteLength)
   })
 }
